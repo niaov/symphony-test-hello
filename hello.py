@@ -10,5 +10,18 @@ def add(a: float, b: float) -> float:
     return a + b
 
 
+def subtract(a: float, b: float) -> float:
+    """Return the difference of two numbers.
+
+    Boolean inputs are rejected even though bool is a subclass of int, because
+    this function expects explicit numeric values rather than truth values.
+    """
+    for value in (a, b):
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            raise TypeError(f"Expected number, got {type(value).__name__}")
+
+    return a - b
+
+
 if __name__ == "__main__":
     print(f"2 + 3 = {add(2, 3)}")
