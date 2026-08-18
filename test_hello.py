@@ -4,7 +4,7 @@ from fractions import Fraction
 
 import pytest
 
-from hello import add
+from hello import add, greet
 
 
 def test_add_positive():
@@ -65,3 +65,22 @@ def test_add_error_message_identifies_operand():
 
 def test_add_accepts_other_real_numbers():
     assert add(Fraction(1, 3), Fraction(1, 6)) == Fraction(1, 2)
+
+
+@pytest.mark.parametrize(
+    ("name", "expected"),
+    [("Alice", "Hello, Alice!"), ("Bob", "Hello, Bob!")],
+)
+def test_greet_returns_expected_greeting(name, expected):
+    assert greet(name) == expected
+
+
+def test_greet_empty_name_raises_type_error():
+    with pytest.raises(TypeError, match="name must be a non-empty string"):
+        greet("")
+
+
+@pytest.mark.parametrize("name", [123, None, ["Alice"]])
+def test_greet_non_string_raises_type_error(name):
+    with pytest.raises(TypeError, match="name must be a non-empty string"):
+        greet(name)
