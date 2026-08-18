@@ -36,3 +36,10 @@ def test_add_large_floats():
 
 def test_add_is_commutative():
     assert add(7, 8) == add(8, 7)
+
+
+def test_add_raises_type_error_for_unsupported_types():
+    with pytest.raises(TypeError):
+        add("a", 1)
+    with pytest.raises(TypeError):
+        add(None, 1)
