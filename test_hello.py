@@ -4,7 +4,7 @@ from fractions import Fraction
 
 import pytest
 
-from hello import add, calculate_discount
+from hello import add, calculate_discount, fibonacci
 
 
 def test_add_positive():
@@ -206,3 +206,42 @@ def test_calculate_discount_accepts_other_real_numbers():
     result = calculate_discount(Fraction(100, 1), False)
     assert result["discount_rate"] == pytest.approx(0.10)
     assert result["discount_amount"] == pytest.approx(10.0)
+
+
+@pytest.mark.parametrize(
+    "n, expected",
+    [
+        (0, 0),
+        (1, 1),
+        (2, 1),
+        (3, 2),
+        (5, 5),
+        (10, 55),
+        (20, 6765),
+    ],
+)
+def test_fibonacci_values(n, expected):
+    assert fibonacci(n) == expected
+
+
+def test_fibonacci_matches_recurrence():
+    for n in range(2, 15):
+        assert fibonacci(n) == fibonacci(n - 1) + fibonacci(n - 2)
+
+
+@pytest.mark.parametrize("n", [-1, -10, -100])
+def test_fibonacci_rejects_negative(n):
+    with pytest.raises(ValueError, match="non-negative"):
+        fibonacci(n)
+
+
+@pytest.mark.parametrize("n", [1.5, "5", None, [3]])
+def test_fibonacci_rejects_non_integer(n):
+    with pytest.raises(TypeError, match="must be an integer"):
+        fibonacci(n)
+
+
+@pytest.mark.parametrize("n", [True, False])
+def test_fibonacci_rejects_bool(n):
+    with pytest.raises(TypeError, match="must be an integer"):
+        fibonacci(n)
