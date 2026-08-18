@@ -6,7 +6,15 @@ Contains basic arithmetic functions. Codex agent will be asked to extend this
 
 
 def add(a: float, b: float) -> float:
-    """Return the sum of two numbers."""
+    """Return the sum of two numbers.
+
+    Args:
+        a: The first addend.
+        b: The second addend.
+
+    Returns:
+        The sum of ``a`` and ``b``.
+    """
     return a + b
 
 
