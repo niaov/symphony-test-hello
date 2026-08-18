@@ -14,7 +14,7 @@ from __future__ import annotations
 import math
 from numbers import Real
 
-__all__ = ["add", "calculate_discount", "fibonacci"]
+__all__ = ["add", "calculate_discount", "fibonacci", "greet"]
 
 
 def _validate_real(value: object, name: str) -> Real:
@@ -57,6 +57,23 @@ def add(a: Real, b: Real) -> Real:
             infinity).
     """
     return _validate_real(a, "a") + _validate_real(b, "b")
+
+
+def greet(name: str) -> str:
+    """Return a greeting for the given name.
+
+    Args:
+        name: The name to greet.
+
+    Returns:
+        A greeting string such as ``"Hello, Alice!"``.
+
+    Raises:
+        TypeError: If ``name`` is empty or not a string.
+    """
+    if not isinstance(name, str) or not name:
+        raise TypeError("name must be a non-empty string")
+    return f"Hello, {name}!"
 
 
 def calculate_discount(subtotal: Real, is_new_customer: bool) -> dict[str, Real]:

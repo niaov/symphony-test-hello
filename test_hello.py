@@ -4,7 +4,7 @@ from fractions import Fraction
 
 import pytest
 
-from hello import add, calculate_discount, fibonacci
+from hello import add, calculate_discount, fibonacci, greet
 
 
 def test_add_positive():
@@ -245,3 +245,22 @@ def test_fibonacci_rejects_non_integer(n):
 def test_fibonacci_rejects_bool(n):
     with pytest.raises(TypeError, match="must be an integer"):
         fibonacci(n)
+
+
+@pytest.mark.parametrize(
+    ("name", "expected"),
+    [("Alice", "Hello, Alice!"), ("Bob", "Hello, Bob!")],
+)
+def test_greet_returns_expected_greeting(name, expected):
+    assert greet(name) == expected
+
+
+def test_greet_empty_name_raises_type_error():
+    with pytest.raises(TypeError, match="name must be a non-empty string"):
+        greet("")
+
+
+@pytest.mark.parametrize("name", [123, None, ["Alice"]])
+def test_greet_non_string_raises_type_error(name):
+    with pytest.raises(TypeError, match="name must be a non-empty string"):
+        greet(name)
