@@ -14,7 +14,7 @@ from __future__ import annotations
 import math
 from numbers import Real
 
-__all__ = ["add"]
+__all__ = ["add", "fibonacci"]
 
 
 def _validate_real(value: object, name: str) -> Real:
@@ -59,5 +59,35 @@ def add(a: Real, b: Real) -> Real:
     return _validate_real(a, "a") + _validate_real(b, "b")
 
 
+def fibonacci(n: int) -> int:
+    """Return the nth Fibonacci number.
+
+    The sequence is defined as fibonacci(0) == 0, fibonacci(1) == 1, and
+    fibonacci(n) == fibonacci(n - 1) + fibonacci(n - 2) for n >= 2.
+
+    Args:
+        n: The zero-based index of the Fibonacci number to compute. Must be a
+            non-negative integer.
+
+    Returns:
+        The nth Fibonacci number.
+
+    Raises:
+        TypeError: If ``n`` is not an integer, or is a ``bool``.
+        ValueError: If ``n`` is negative.
+    """
+    if isinstance(n, bool) or not isinstance(n, int):
+        raise TypeError(
+            f"n must be an integer, got {type(n).__name__}"
+        )
+    if n < 0:
+        raise ValueError("n must be non-negative")
+    a, b = 0, 1
+    for _ in range(n):
+        a, b = b, a + b
+    return a
+
+
 if __name__ == "__main__":
     print(f"2 + 3 = {add(2, 3)}")
+    print(f"fibonacci(10) = {fibonacci(10)}")
