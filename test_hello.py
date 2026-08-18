@@ -4,7 +4,7 @@ from fractions import Fraction
 
 import pytest
 
-from hello import add, fibonacci
+from hello import add, calculate_discount, fibonacci
 
 
 def test_add_positive():
@@ -65,6 +65,147 @@ def test_add_error_message_identifies_operand():
 
 def test_add_accepts_other_real_numbers():
     assert add(Fraction(1, 3), Fraction(1, 6)) == Fraction(1, 2)
+
+
+@pytest.mark.parametrize(
+    ("subtotal", "is_new_customer", "expected"),
+    [
+        # Returning customer, all three discount tiers.
+        (50, False, {"discount_rate": 0.0, "discount_amount": 0.0,
+                     "new_customer_discount": 0.0, "shipping": 10.0,
+                     "total": 60.0}),
+        (100, False, {"discount_rate": 0.10, "discount_amount": 10.0,
+                      "new_customer_discount": 0.0, "shipping": 10.0,
+                      "total": 100.0}),
+        (200, False, {"discount_rate": 0.20, "discount_amount": 40.0,
+                      "new_customer_discount": 0.0, "shipping": 0.0,
+                      "total": 160.0}),
+        # New customer, all three discount tiers.
+        (50, True, {"discount_rate": 0.0, "discount_amount": 0.0,
+                    "new_customer_discount": 5.0, "shipping": 10.0,
+                    "total": 55.0}),
+        (100, True, {"discount_rate": 0.10, "discount_amount": 10.0,
+                     "new_customer_discount": 5.0, "shipping": 0.0,
+                     "total": 85.0}),
+        (200, True, {"discount_rate": 0.20, "discount_amount": 40.0,
+                     "new_customer_discount": 5.0, "shipping": 0.0,
+                     "total": 155.0}),
+    ],
+)
+def test_calculate_discount_six_combinations(subtotal, is_new_customer, expected):
+    result = calculate_discount(subtotal, is_new_customer)
+    assert result["subtotal"] == subtotal
+    for key, value in expected.items():
+        assert result[key] == pytest.approx(value)
+
+
+@pytest.mark.parametrize(
+    ("subtotal", "is_new_customer", "rate", "shipping", "total"),
+    [
+        (99.99, False, 0.0, 10.0, 109.99),
+        (100.0, False, 0.10, 10.0, 100.0),
+        (150.0, False, 0.10, 10.0, 145.0),
+        (199.99, False, 0.10, 10.0, 189.991),
+        (200.0, False, 0.20, 0.0, 160.0),
+        (99.99, True, 0.0, 10.0, 104.99),
+        (100.0, True, 0.10, 0.0, 85.0),
+        (150.0, True, 0.10, 0.0, 130.0),
+        (199.99, True, 0.10, 0.0, 174.991),
+        (200.0, True, 0.20, 0.0, 155.0),
+    ],
+)
+def test_calculate_discount_boundaries(
+    subtotal, is_new_customer, rate, shipping, total
+):
+    result = calculate_discount(subtotal, is_new_customer)
+    assert result["discount_rate"] == pytest.approx(rate)
+    assert result["discount_amount"] == pytest.approx(subtotal * rate)
+    assert result["shipping"] == pytest.approx(shipping)
+    assert result["total"] == pytest.approx(total)
+
+
+def test_calculate_discount_new_customer_just_below_hundred():
+    """Boundary: new customer just below $100 gets 0% tier and $5 off.
+
+    Shipping is not free here: the new-customer free-shipping rule requires a
+    subtotal of at least $100, so the flat $10 shipping applies.
+    """
+    result = calculate_discount(99.99, True)
+    assert result["subtotal"] == pytest.approx(99.99)
+    assert result["discount_rate"] == pytest.approx(0.0)
+    assert result["discount_amount"] == pytest.approx(0.0)
+    assert result["new_customer_discount"] == pytest.approx(5.0)
+    assert result["shipping"] == pytest.approx(10.0)
+    assert result["total"] == pytest.approx(104.99)
+
+
+def test_calculate_discount_zero_subtotal():
+    result = calculate_discount(0, False)
+    assert result["discount_rate"] == 0.0
+    assert result["discount_amount"] == pytest.approx(0.0)
+    assert result["new_customer_discount"] == pytest.approx(0.0)
+    assert result["shipping"] == pytest.approx(10.0)
+    assert result["total"] == pytest.approx(10.0)
+
+
+def test_calculate_discount_negative_subtotal():
+    # Negative subtotals are accepted and evaluated deterministically.
+    result = calculate_discount(-50, True)
+    assert result["discount_rate"] == 0.0
+    assert result["discount_amount"] == pytest.approx(0.0)
+    assert result["new_customer_discount"] == pytest.approx(5.0)
+    assert result["shipping"] == pytest.approx(10.0)
+    assert result["total"] == pytest.approx(-45.0)
+
+
+def test_calculate_discount_float_subtotal_in_tier():
+    result = calculate_discount(123.45, False)
+    assert result["discount_rate"] == pytest.approx(0.10)
+    assert result["discount_amount"] == pytest.approx(12.345)
+    assert result["shipping"] == pytest.approx(10.0)
+    assert result["total"] == pytest.approx(121.105)
+
+
+def test_calculate_discount_returns_expected_keys():
+    result = calculate_discount(100, False)
+    assert set(result) == {
+        "subtotal",
+        "discount_rate",
+        "discount_amount",
+        "new_customer_discount",
+        "shipping",
+        "total",
+    }
+
+
+@pytest.mark.parametrize("value", ["a", None, [1, 2]])
+def test_calculate_discount_rejects_non_numeric_subtotal(value):
+    with pytest.raises(TypeError):
+        calculate_discount(value, False)
+
+
+@pytest.mark.parametrize("value", [True, False])
+def test_calculate_discount_rejects_bool_subtotal(value):
+    with pytest.raises(TypeError, match="subtotal must be a real number"):
+        calculate_discount(value, False)
+
+
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf")])
+def test_calculate_discount_rejects_non_finite_subtotal(value):
+    with pytest.raises(ValueError, match="must be finite"):
+        calculate_discount(value, False)
+
+
+@pytest.mark.parametrize("value", [None, "yes", 1, 0, [True]])
+def test_calculate_discount_rejects_non_bool_customer(value):
+    with pytest.raises(TypeError, match="is_new_customer must be a bool"):
+        calculate_discount(100, value)
+
+
+def test_calculate_discount_accepts_other_real_numbers():
+    result = calculate_discount(Fraction(100, 1), False)
+    assert result["discount_rate"] == pytest.approx(0.10)
+    assert result["discount_amount"] == pytest.approx(10.0)
 
 
 @pytest.mark.parametrize(

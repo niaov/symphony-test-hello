@@ -14,7 +14,7 @@ from __future__ import annotations
 import math
 from numbers import Real
 
-__all__ = ["add", "fibonacci"]
+__all__ = ["add", "calculate_discount", "fibonacci"]
 
 
 def _validate_real(value: object, name: str) -> Real:
@@ -57,6 +57,63 @@ def add(a: Real, b: Real) -> Real:
             infinity).
     """
     return _validate_real(a, "a") + _validate_real(b, "b")
+
+
+def calculate_discount(subtotal: Real, is_new_customer: bool) -> dict[str, Real]:
+    """Calculate discounts, shipping, and total for a purchase.
+
+    A single percentage discount tier applies based on the subtotal (the
+    highest tier only; tiers do not stack). New customers receive an
+    additional flat $5 discount that stacks after the percentage discount.
+    Shipping is free for large orders or for new customers above the
+    mid-tier threshold, otherwise it is a flat $10.
+
+    Args:
+        subtotal: The pre-discount purchase subtotal.
+        is_new_customer: Whether the customer is new.
+
+    Returns:
+        A dict with keys ``subtotal``, ``discount_rate``,
+        ``discount_amount``, ``new_customer_discount``, ``shipping``, and
+        ``total``.
+
+    Raises:
+        TypeError: If ``subtotal`` is not a real number (or is a ``bool``),
+            or if ``is_new_customer`` is not a ``bool``.
+        ValueError: If ``subtotal`` is a non-finite ``float`` (NaN or
+            infinity).
+    """
+    subtotal = _validate_real(subtotal, "subtotal")
+    if not isinstance(is_new_customer, bool):
+        raise TypeError(
+            "is_new_customer must be a bool, "
+            f"got {type(is_new_customer).__name__}"
+        )
+
+    if subtotal >= 200:
+        discount_rate = 0.20
+    elif subtotal >= 100:
+        discount_rate = 0.10
+    else:
+        discount_rate = 0.0
+
+    discount_amount = subtotal * discount_rate
+    new_customer_discount = 5.0 if is_new_customer else 0.0
+
+    if subtotal >= 200 or (is_new_customer and subtotal >= 100):
+        shipping = 0.0
+    else:
+        shipping = 10.0
+
+    total = subtotal - discount_amount - new_customer_discount + shipping
+    return {
+        "subtotal": subtotal,
+        "discount_rate": discount_rate,
+        "discount_amount": discount_amount,
+        "new_customer_discount": new_customer_discount,
+        "shipping": shipping,
+        "total": total,
+    }
 
 
 def fibonacci(n: int) -> int:
