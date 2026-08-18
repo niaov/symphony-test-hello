@@ -47,14 +47,14 @@ def test_multiply(a, b, expected):
 @pytest.mark.parametrize("func", [add, subtract, multiply])
 @pytest.mark.parametrize("bad_value", ["5", None, True, [1]])
 def test_operations_reject_non_numeric_input(func, bad_value):
-    with pytest.raises(TypeError, match="Expected number, got"):
+    with pytest.raises(TypeError, match=r"Expected number for a, got \w+"):
         func(bad_value, 3)
 
 
 @pytest.mark.parametrize("func", [add, subtract, multiply])
 @pytest.mark.parametrize("bad_value", ["5", None, False, {"a": 1}])
 def test_operations_reject_non_numeric_second_argument(func, bad_value):
-    with pytest.raises(TypeError, match="Expected number, got"):
+    with pytest.raises(TypeError, match=r"Expected number for b, got \w+"):
         func(3, bad_value)
 
 

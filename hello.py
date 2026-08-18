@@ -14,7 +14,9 @@ def _validate_number(value: object, name: str) -> None:
         TypeError: if *value* is not a real number.
     """
     if isinstance(value, bool) or not isinstance(value, Real):
-        raise TypeError(f"Expected number, got {type(value).__name__}")
+        raise TypeError(
+            f"Expected number for {name}, got {type(value).__name__}"
+        )
 
 
 def add(a: float, b: float) -> float:
