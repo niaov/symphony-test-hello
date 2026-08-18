@@ -4,7 +4,7 @@ from fractions import Fraction
 
 import pytest
 
-from hello import add
+from hello import add, fibonacci
 
 
 def test_add_positive():
@@ -65,3 +65,42 @@ def test_add_error_message_identifies_operand():
 
 def test_add_accepts_other_real_numbers():
     assert add(Fraction(1, 3), Fraction(1, 6)) == Fraction(1, 2)
+
+
+@pytest.mark.parametrize(
+    "n, expected",
+    [
+        (0, 0),
+        (1, 1),
+        (2, 1),
+        (3, 2),
+        (5, 5),
+        (10, 55),
+        (20, 6765),
+    ],
+)
+def test_fibonacci_values(n, expected):
+    assert fibonacci(n) == expected
+
+
+def test_fibonacci_matches_recurrence():
+    for n in range(2, 15):
+        assert fibonacci(n) == fibonacci(n - 1) + fibonacci(n - 2)
+
+
+@pytest.mark.parametrize("n", [-1, -10, -100])
+def test_fibonacci_rejects_negative(n):
+    with pytest.raises(ValueError, match="non-negative"):
+        fibonacci(n)
+
+
+@pytest.mark.parametrize("n", [1.5, "5", None, [3]])
+def test_fibonacci_rejects_non_integer(n):
+    with pytest.raises(TypeError, match="must be an integer"):
+        fibonacci(n)
+
+
+@pytest.mark.parametrize("n", [True, False])
+def test_fibonacci_rejects_bool(n):
+    with pytest.raises(TypeError, match="must be an integer"):
+        fibonacci(n)
