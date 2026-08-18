@@ -124,6 +124,21 @@ def test_calculate_discount_boundaries(
     assert result["total"] == pytest.approx(total)
 
 
+def test_calculate_discount_new_customer_just_below_hundred():
+    """Boundary: new customer just below $100 gets 0% tier and $5 off.
+
+    Shipping is not free here: the new-customer free-shipping rule requires a
+    subtotal of at least $100, so the flat $10 shipping applies.
+    """
+    result = calculate_discount(99.99, True)
+    assert result["subtotal"] == pytest.approx(99.99)
+    assert result["discount_rate"] == pytest.approx(0.0)
+    assert result["discount_amount"] == pytest.approx(0.0)
+    assert result["new_customer_discount"] == pytest.approx(5.0)
+    assert result["shipping"] == pytest.approx(10.0)
+    assert result["total"] == pytest.approx(104.99)
+
+
 def test_calculate_discount_zero_subtotal():
     result = calculate_discount(0, False)
     assert result["discount_rate"] == 0.0
