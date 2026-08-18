@@ -1,12 +1,48 @@
 """Minimal module for Symphony verification testing.
 
-Contains basic arithmetic functions. Codex agent will be asked to extend this
-(e.g. add a multiply function) via a GitHub issue, then create a PR.
+Contains basic arithmetic functions hardened for production use:
+
+- Operands are validated to be real numbers (``int``, ``float``, or other
+  ``numbers.Real`` types); ``bool`` is rejected explicitly because it is a
+  subclass of ``int`` and is almost always a caller mistake here.
+- Non-finite ``float`` operands (NaN or +/- infinity) are rejected so invalid
+  results do not propagate silently through the application.
 """
 
+from __future__ import annotations
 
-def add(a: float, b: float) -> float:
-    """Return the sum of two numbers.
+import math
+from numbers import Real
+
+__all__ = ["add"]
+
+
+def _validate_real(value: object, name: str) -> Real:
+    """Validate and return a real-number operand.
+
+    Args:
+        value: The operand to validate.
+        name: The operand name, used in error messages.
+
+    Returns:
+        The validated operand, unchanged.
+
+    Raises:
+        TypeError: If ``value`` is not a real number, or is a ``bool``.
+        ValueError: If ``value`` is a non-finite ``float`` (NaN or infinity).
+    """
+    if isinstance(value, bool) or not isinstance(value, Real):
+        raise TypeError(
+            f"{name} must be a real number (int or float), "
+            f"got {type(value).__name__}"
+        )
+    if isinstance(value, float) and not math.isfinite(value):
+        raise ValueError(f"{name} must be finite, got {value!r}")
+    return value
+
+
+def add(a: Real, b: Real) -> Real:
+    """Return the sum of two real numbers.
 
     Args:
         a: The first addend.
@@ -14,8 +50,13 @@ def add(a: float, b: float) -> float:
 
     Returns:
         The sum of ``a`` and ``b``.
+
+    Raises:
+        TypeError: If either operand is not a real number, or is a ``bool``.
+        ValueError: If either operand is a non-finite ``float`` (NaN or
+            infinity).
     """
-    return a + b
+    return _validate_real(a, "a") + _validate_real(b, "b")
 
 
 if __name__ == "__main__":

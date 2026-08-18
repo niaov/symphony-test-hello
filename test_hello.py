@@ -1,5 +1,7 @@
 """Pytest tests for the hello module."""
 
+from fractions import Fraction
+
 import pytest
 
 from hello import add
@@ -42,3 +44,24 @@ def test_add_is_commutative():
 def test_add_raises_type_error_for_non_numeric(value):
     with pytest.raises(TypeError):
         add(value, 1)
+
+
+@pytest.mark.parametrize("value", [True, False])
+def test_add_rejects_bool(value):
+    with pytest.raises(TypeError, match="must be a real number"):
+        add(value, 1)
+
+
+@pytest.mark.parametrize("value", [float("nan"), float("inf"), float("-inf")])
+def test_add_rejects_non_finite_floats(value):
+    with pytest.raises(ValueError, match="must be finite"):
+        add(value, 1)
+
+
+def test_add_error_message_identifies_operand():
+    with pytest.raises(TypeError, match="b must be a real number"):
+        add(1, "oops")
+
+
+def test_add_accepts_other_real_numbers():
+    assert add(Fraction(1, 3), Fraction(1, 6)) == Fraction(1, 2)
