@@ -4,7 +4,7 @@ from fractions import Fraction
 
 import pytest
 
-from hello import add, calculate_discount, cube, fibonacci, greet
+from hello import add, calculate_discount, cube, fibonacci, greet, square
 
 
 def test_add_positive():
@@ -276,3 +276,16 @@ def test_greet_empty_name_raises_type_error():
 def test_greet_non_string_raises_type_error(name):
     with pytest.raises(TypeError, match="name must be a non-empty string"):
         greet(name)
+
+
+@pytest.mark.parametrize(
+    ("n", "expected"),
+    [
+        (3.0, 9.0),
+        (-4.0, 16.0),
+        (0.0, 0.0),
+    ],
+)
+def test_square_values(n, expected):
+    # pytest.approx avoids binary float precision issues for non-integer inputs.
+    assert square(n) == pytest.approx(expected)
