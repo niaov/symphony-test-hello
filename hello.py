@@ -14,7 +14,7 @@ from __future__ import annotations
 import math
 from numbers import Real
 
-__all__ = ["add", "calculate_discount", "fibonacci", "greet"]
+__all__ = ["add", "calculate_discount", "fibonacci", "greet", "square"]
 
 
 def _validate_real(value: object, name: str) -> Real:
@@ -160,6 +160,18 @@ def fibonacci(n: int) -> int:
     for _ in range(n):
         a, b = b, a + b
     return a
+
+
+def square(n: float) -> float:
+    """Return the square of a number.
+
+    Args:
+        n: The number to square.
+
+    Returns:
+        ``n`` multiplied by itself (``n * n``).
+    """
+    return n * n
 
 
 if __name__ == "__main__":
