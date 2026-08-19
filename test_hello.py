@@ -1,5 +1,6 @@
 """Pytest tests for the hello module."""
 
+import math
 from fractions import Fraction
 
 import pytest
@@ -8,6 +9,7 @@ from hello import (
     add,
     calculate_discount,
     cube,
+    factorial,
     fibonacci,
     greet,
     is_even,
@@ -86,6 +88,43 @@ def test_add_accepts_other_real_numbers():
 )
 def test_cube_positive_negative_zero(n, expected):
     assert cube(n) == pytest.approx(expected)
+
+
+@pytest.mark.parametrize(
+    ("n", "expected"),
+    [
+        (0, 1),
+        (1, 1),
+        (5, 120),
+        (10, 3628800),
+        (20, 2432902008176640000),
+    ],
+)
+def test_factorial_values(n, expected):
+    assert factorial(n) == expected
+
+
+def test_factorial_large_n_iterative():
+    # Iteration handles large n without recursion depth issues.
+    assert factorial(100) == math.factorial(100)
+
+
+@pytest.mark.parametrize("n", [-1, -10, -100])
+def test_factorial_rejects_negative(n):
+    with pytest.raises(ValueError, match="non-negative"):
+        factorial(n)
+
+
+@pytest.mark.parametrize("n", [1.5, "5", None, [3]])
+def test_factorial_rejects_non_integer(n):
+    with pytest.raises(TypeError, match="must be an integer"):
+        factorial(n)
+
+
+@pytest.mark.parametrize("n", [True, False])
+def test_factorial_rejects_bool(n):
+    with pytest.raises(TypeError, match="must be an integer"):
+        factorial(n)
 
 
 @pytest.mark.parametrize(
