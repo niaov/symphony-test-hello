@@ -14,7 +14,7 @@ from __future__ import annotations
 import math
 from numbers import Real
 
-__all__ = ["add", "calculate_discount", "fibonacci", "greet", "is_even", "square"]
+__all__ = ["add", "calculate_discount", "cube", "fibonacci", "greet", "is_even", "square"]
 
 
 def _validate_real(value: object, name: str) -> Real:
@@ -57,6 +57,23 @@ def add(a: Real, b: Real) -> Real:
             infinity).
     """
     return _validate_real(a, "a") + _validate_real(b, "b")
+
+
+def cube(n: float) -> float:
+    """Return the cube of a real number.
+
+    Args:
+        n: The number to cube.
+
+    Returns:
+        The cube of ``n`` (``n * n * n``).
+
+    Raises:
+        TypeError: If ``n`` is not a real number, or is a ``bool``.
+        ValueError: If ``n`` is a non-finite ``float`` (NaN or infinity).
+    """
+    n = _validate_real(n, "n")
+    return n * n * n
 
 
 def greet(name: str) -> str:
