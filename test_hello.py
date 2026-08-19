@@ -4,7 +4,16 @@ from fractions import Fraction
 
 import pytest
 
-from hello import add, calculate_discount, cube, fibonacci, greet, is_even, square
+from hello import (
+    add,
+    calculate_discount,
+    cube,
+    factorial,
+    fibonacci,
+    greet,
+    is_even,
+    square,
+)
 
 
 def test_add_positive():
@@ -257,6 +266,38 @@ def test_fibonacci_rejects_non_integer(n):
 def test_fibonacci_rejects_bool(n):
     with pytest.raises(TypeError, match="must be an integer"):
         fibonacci(n)
+
+
+@pytest.mark.parametrize(
+    ("n", "expected"),
+    [
+        (0, 1),
+        (1, 1),
+        (5, 120),
+        (10, 3628800),
+        (20, 2432902008176640000),
+    ],
+)
+def test_factorial_values(n, expected):
+    assert factorial(n) == expected
+
+
+@pytest.mark.parametrize("n", [-1, -10, -100])
+def test_factorial_rejects_negative(n):
+    with pytest.raises(ValueError, match="not defined for negative numbers"):
+        factorial(n)
+
+
+@pytest.mark.parametrize("n", [1.5, "5", None, [3]])
+def test_factorial_rejects_non_integer(n):
+    with pytest.raises(TypeError, match="must be an integer"):
+        factorial(n)
+
+
+@pytest.mark.parametrize("n", [True, False])
+def test_factorial_rejects_bool(n):
+    with pytest.raises(TypeError, match="must be an integer"):
+        factorial(n)
 
 
 @pytest.mark.parametrize(

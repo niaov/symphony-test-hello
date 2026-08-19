@@ -14,7 +14,16 @@ from __future__ import annotations
 import math
 from numbers import Real
 
-__all__ = ["add", "calculate_discount", "cube", "fibonacci", "greet", "is_even", "square"]
+__all__ = [
+    "add",
+    "calculate_discount",
+    "cube",
+    "factorial",
+    "fibonacci",
+    "greet",
+    "is_even",
+    "square",
+]
 
 
 def _validate_real(value: object, name: str) -> Real:
@@ -177,6 +186,35 @@ def fibonacci(n: int) -> int:
     for _ in range(n):
         a, b = b, a + b
     return a
+
+
+def factorial(n: int) -> int:
+    """Return the factorial of a non-negative integer.
+
+    The factorial of n (written n!) is the product of all positive integers
+    from 1 to n, with factorial(0) == 1 by convention. The computation is
+    iterative so it does not risk stack overflow for large inputs.
+
+    Args:
+        n: The non-negative integer to compute the factorial of.
+
+    Returns:
+        The factorial of ``n`` (``n!``).
+
+    Raises:
+        TypeError: If ``n`` is not an integer, or is a ``bool``.
+        ValueError: If ``n`` is negative.
+    """
+    if isinstance(n, bool) or not isinstance(n, int):
+        raise TypeError(
+            f"n must be an integer, got {type(n).__name__}"
+        )
+    if n < 0:
+        raise ValueError("factorial not defined for negative numbers")
+    result = 1
+    for i in range(2, n + 1):
+        result *= i
+    return result
 
 
 def is_even(n: int) -> bool:
