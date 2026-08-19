@@ -4,7 +4,7 @@ from fractions import Fraction
 
 import pytest
 
-from hello import add, calculate_discount, cube, fibonacci, greet, square
+from hello import add, calculate_discount, cube, fibonacci, greet, is_even, square
 
 
 def test_add_positive():
@@ -257,6 +257,19 @@ def test_fibonacci_rejects_non_integer(n):
 def test_fibonacci_rejects_bool(n):
     with pytest.raises(TypeError, match="must be an integer"):
         fibonacci(n)
+
+
+@pytest.mark.parametrize(
+    ("n", "expected"),
+    [
+        (4, True),   # even positive
+        (7, False),  # odd positive
+        (-6, True),  # negative even
+        (-3, False), # negative odd
+    ],
+)
+def test_is_even(n, expected):
+    assert is_even(n) is expected
 
 
 @pytest.mark.parametrize(

@@ -14,7 +14,7 @@ from __future__ import annotations
 import math
 from numbers import Real
 
-__all__ = ["add", "calculate_discount", "cube", "fibonacci", "greet", "square"]
+__all__ = ["add", "calculate_discount", "cube", "fibonacci", "greet", "is_even", "square"]
 
 
 def _validate_real(value: object, name: str) -> Real:
@@ -177,6 +177,18 @@ def fibonacci(n: int) -> int:
     for _ in range(n):
         a, b = b, a + b
     return a
+
+
+def is_even(n: int) -> bool:
+    """Return whether an integer is even.
+
+    Args:
+        n: The integer to check.
+
+    Returns:
+        True if ``n`` is even, False if it is odd.
+    """
+    return n % 2 == 0
 
 
 def square(n: float) -> float:
