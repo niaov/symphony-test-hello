@@ -22,6 +22,7 @@ __all__ = [
     "fibonacci",
     "greet",
     "is_even",
+    "is_prime",
     "square",
 ]
 
@@ -225,6 +226,31 @@ def is_even(n: int) -> bool:
         True if ``n`` is even, False if it is odd.
     """
     return n % 2 == 0
+
+
+def is_prime(n: int) -> bool:
+    """Return whether an integer is prime.
+
+    A prime number is a positive integer greater than 1 with no positive
+    divisors other than 1 and itself. Negative numbers, 0, and 1 are not
+    prime.
+
+    Args:
+        n: The integer to check.
+
+    Returns:
+        True if ``n`` is prime, False otherwise.
+    """
+    if n <= 1:
+        return False
+    if n == 2:
+        return True
+    if n % 2 == 0:
+        return False
+    for divisor in range(3, math.isqrt(n) + 1, 2):
+        if n % divisor == 0:
+            return False
+    return True
 
 
 def square(n: float) -> float:

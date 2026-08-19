@@ -13,6 +13,7 @@ from hello import (
     fibonacci,
     greet,
     is_even,
+    is_prime,
     square,
 )
 
@@ -317,6 +318,23 @@ def test_fibonacci_rejects_bool(n):
 )
 def test_is_even(n, expected):
     assert is_even(n) is expected
+
+
+@pytest.mark.parametrize(
+    ("n", "expected"),
+    [
+        (0, False),   # 0 is not prime
+        (1, False),   # 1 is not prime
+        (2, True),    # 2 is the only even prime
+        (3, True),    # small odd prime
+        (4, False),   # even composite
+        (9, False),   # odd composite
+        (-7, False),  # negative numbers are not prime
+        (97, True),   # large prime
+    ],
+)
+def test_is_prime(n, expected):
+    assert is_prime(n) is expected
 
 
 @pytest.mark.parametrize(
