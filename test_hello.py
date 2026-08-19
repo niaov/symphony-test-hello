@@ -4,7 +4,7 @@ from fractions import Fraction
 
 import pytest
 
-from hello import add, calculate_discount, fibonacci, greet, square
+from hello import add, calculate_discount, cube, fibonacci, greet, square
 
 
 def test_add_positive():
@@ -65,6 +65,18 @@ def test_add_error_message_identifies_operand():
 
 def test_add_accepts_other_real_numbers():
     assert add(Fraction(1, 3), Fraction(1, 6)) == Fraction(1, 2)
+
+
+@pytest.mark.parametrize(
+    ("n", "expected"),
+    [
+        (2.0, 8.0),   # positive
+        (-3.0, -27.0),  # negative
+        (0.0, 0.0),   # zero
+    ],
+)
+def test_cube_positive_negative_zero(n, expected):
+    assert cube(n) == pytest.approx(expected)
 
 
 @pytest.mark.parametrize(
